@@ -1,3 +1,3 @@
-class FlogReviewJob
-  @queue = :flog_review
+class FlogReviewJob < ApplicationJob
+  queue_as :flog_review
 end

@@ -22,13 +22,12 @@ RSpec.describe Linter::Phpcs do
       raw_config = "<ruleset></ruleset>"
       stub_config(raw_config)
       commit_file = build_commit_file(filename: "lib/foo.php")
-      allow(Resque).to receive(:enqueue)
       linter = build_linter(build)
+      allow(LintersJob).to receive(:perform_later)
 
       linter.file_review(commit_file)
 
-      expect(Resque).to have_received(:enqueue).with(
-        LintersJob,
+      expect(LintersJob).to have_received(:perform_later).with(
         filename: commit_file.filename,
         commit_sha: build.commit_sha,
         linter_name: "phpcs",

@@ -1,3 +1,3 @@
-class JshintReviewJob
-  @queue = :jshint_review
+class JshintReviewJob < ApplicationJob
+  queue_as :jshint_review
 end

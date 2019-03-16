@@ -1,10 +1,6 @@
 require "rails_helper"
 
 describe RepoSynchronizationJob do
-  it "is retryable" do
-    expect(RepoSynchronizationJob.new).to be_a(Retryable)
-  end
-
   it "queue_as high" do
     expect(RepoSynchronizationJob.new.queue_name).to eq("high")
   end

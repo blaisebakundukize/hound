@@ -1,16 +1,26 @@
 module Buildable
+  extend ActiveSupport::Concern
+
+  included do
+    rescue_from(StandardError) do |exception|
+      if exception.is_a?(Octokit::Unauthorized)
+        raise exception
+      elsif executions > Hound::JOB_RETRY_ATTEMPTS
+        if !exception.message.match?(%r{/statuses/\w+: 404 - Not Found})
+          set_error_status
+        end
+      else
+        retry_job wait: Hound::JOB_RETRY_DELAY
+      end
+    end
+  end
+
   def perform(payload_data)
     payload = Payload.new(payload_data)
 
     unless blacklisted?(payload)
       UpdateRepoStatus.call(payload)
       StartBuild.call(payload)
-    end
-  end
-
-  def after_retry_exhausted
-    unless $! && $!.message.match?(%r{/statuses/\w+: 404 - Not Found})
-      set_error_status
     end
   end
 

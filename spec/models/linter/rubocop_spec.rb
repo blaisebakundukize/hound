@@ -32,12 +32,11 @@ RSpec.describe Linter::Rubocop do
       linter = build_linter(build)
       stub_ruby_config({})
       commit_file = build_commit_file(filename: "lib/a.rb")
-      allow(Resque).to receive(:enqueue)
+      allow(LintersJob).to receive(:perform_later)
 
       linter.file_review(commit_file)
 
-      expect(Resque).to have_received(:enqueue).with(
-        LintersJob,
+      expect(LintersJob).to have_received(:perform_later).with(
         filename: commit_file.filename,
         commit_sha: build.commit_sha,
         linter_name: "rubocop",

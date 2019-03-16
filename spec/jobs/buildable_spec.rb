@@ -1,7 +1,7 @@
 require "rails_helper"
 
-describe Buildable do
-  class BuildableTestJob < ActiveJob::Base
+RSpec.describe Buildable do
+  class BuildableTestJob < ApplicationJob
     include Buildable
   end
 
@@ -57,7 +57,7 @@ describe Buildable do
     end
   end
 
-  describe "#after_retry_exhausted" do
+  context "when all retries failed" do
     it "sets internal server error on github" do
       repo = create(:repo, :active)
       raw_payload = payload_data(
@@ -70,8 +70,12 @@ describe Buildable do
         "error",
         I18n.t(:hound_error_status),
       )
+      stub_const("Hound::JOB_RETRY_ATTEMPTS", 0)
+      allow(UpdateRepoStatus).
+        to receive(:call).
+        and_raise(Octokit::NotFound, "foo bar")
 
-      BuildableTestJob.new(raw_payload).after_retry_exhausted
+      BuildableTestJob.perform_now(raw_payload)
 
       expect(error_status_request).to have_been_made
     end

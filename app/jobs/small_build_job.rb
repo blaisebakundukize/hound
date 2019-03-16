@@ -1,5 +1,5 @@
 class SmallBuildJob < ApplicationJob
-  queue_as :medium
-
   include Buildable
+
+  queue_as :medium
 end

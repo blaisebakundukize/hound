@@ -371,6 +371,7 @@ describe RepoActivator do
 
   def stub_github_api(options = {})
     default_options = {
+      repository?: true,
       remove_hook: true,
       add_collaborator: true,
       remove_collaborator: true,

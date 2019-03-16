@@ -1,3 +1,3 @@
-class EslintReviewJob
-  @queue = :eslint_review
+class EslintReviewJob < ApplicationJob
+  queue_as :eslint_review
 end
